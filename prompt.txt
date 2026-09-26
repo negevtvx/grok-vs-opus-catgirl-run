@@ -1,0 +1,47 @@
+Create a single self-contained HTML file with a procedurally built 3D anime cat-girl running in a seamless loop, using Three.js. Return ONLY the complete HTML in one code block, with no explanation before or after. Don't ask questions. If something is unspecified, pick something sensible and list those choices in a comment at the top of the file.
+
+HARD CONSTRAINTS
+- Load Three.js r160 with this exact import map. No other libraries, no build step:
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+- Build everything procedurally. Primitives, LatheGeometry, TubeGeometry, ExtrudeGeometry, CanvasTexture and DataTexture are fine. No external models, images, textures or fonts.
+- Put a CONFIG object at the very top of the script that holds every color below plus the cycle duration.
+
+CHARACTER
+- Build a real joint hierarchy with pivots placed at the joints:
+  pelvis → spine → chest → neck → head
+  chest → shoulder → upper arm → forearm → hand (both sides)
+  pelvis → thigh → shin → foot (both sides)
+- Proportions: stylized anime, about 4 heads tall, total height ≈ 1.6 units, feet at y = 0 on contact. Cute, not chibi.
+- Hair: {{HAIR_COLOR}}. Shoulder-length with blunt bangs, built from at least 10 separate strand or clump meshes (not a single helmet sphere).
+- Cat ears on top of the head, same color as the hair, with a pink inner ear (#ffb3c6).
+- Tail: same color as the hair, tapered, attached at the lower back, made of at least 10 chained segments.
+- Face: large anime eyes (iris #2ec4b6 with white highlights), small mouth, pink blush marks. Skin #ffe0cc.
+- Outfit: oversized light grey hoodie (#e8e8f0), navy track pants (#2b3a67), white sneakers with red soles (#e0443e).
+- Shading: MeshToonMaterial with a 3-step gradient map, plus black inverted-hull outlines on the head, hair, body, limbs and tail.
+
+ANIMATION
+- A single phase value p in [0,1) drives everything and advances with time. One full stride cycle (left step + right step) lasts CONFIG.cycleSeconds = 0.7.
+- Every animated value must be a periodic function of p (sin/cos of 2π·n·p with integer n) so the loop is perfectly seamless. No randomness, no noise, no accumulated state.
+- The character runs in place at the origin, facing +X. The ground scrolls toward −X, at a speed that matches the planted foot's backward motion so the feet don't visibly slide during contact.
+- Required motion:
+  - Legs: a real run cycle with contact, down, passing and up phases, including a flight phase where both feet are off the ground. Knees bend and feet flex.
+  - Body: vertical bob twice per cycle (lowest just after each contact), pelvis yaw and roll, torso counter-rotating against the hips, slight forward lean.
+  - Arms: swing opposite to the legs, with elbows bent about 90°.
+  - Head: stabilized, with much less bob and rotation than the torso, plus a small nod.
+  - Ears: a slight delayed bounce.
+  - Tail: a wave whose phase delay and amplitude increase toward the tip (follow-through), reacting to the body bob.
+  - Hair: back clumps lag behind the head's motion.
+
+SCENE
+- Background #cfe8ff. A large ground plane (#9fd98b) with procedural stripes or grid lines that scroll.
+- A HemisphereLight plus one DirectionalLight casting soft shadows. The character casts a shadow on the ground.
+- PerspectiveCamera with fov 35, positioned at (4, 1.6, 5), looking at (0, 0.9, 0). OrbitControls enabled.
+- Handle window resize. Cap the pixel ratio at 2.
+
+CONTROLS (list them in a small overlay, top-left)
+- Space: pause/play
+- S: toggle 0.25× slow motion
+- 0–9: pause and jump to phase p = 0.0 … 0.9
+- R: reset the camera to its exact start position
+
+The file must run with zero console errors when opened directly in Chrome.

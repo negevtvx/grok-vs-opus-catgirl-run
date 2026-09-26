@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grok 4.7 vs Claude Opus 5.5: cat-girl run cycle</title>
+<link rel="icon" href="data:,">
+<!--
+  Side-by-side viewer for the two model outputs in ./outputs.
+  This page is NOT part of either model's output. It only puts both files in iframes
+  and mirrors keyboard input from one side to the other so they can be compared live.
+-->
+<style>
+  :root { --bg: #101114; --fg: #f3f4f8; --muted: #9aa0ae; --line: #2a2d35; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg);
+    font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  body { display: flex; flex-direction: column; }
+  main { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 3px; min-height: 0; background: var(--bg); }
+  section { display: flex; flex-direction: column; min-height: 0; }
+  iframe { flex: 1; width: 100%; border: 0; display: block; background: #cfe8ff; }
+  .label { display: flex; align-items: baseline; justify-content: center; gap: 10px; padding: 10px 12px;
+    border-top: 1px solid var(--line); }
+  .label b { font-size: 20px; }
+  .label span { color: var(--muted); font-size: 15px; }
+  .label a { color: var(--muted); font-size: 13px; margin-left: 6px; }
+  footer { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; padding: 8px 16px 10px;
+    color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); }
+  footer a { color: var(--fg); }
+  kbd { font: 12px ui-monospace, Consolas, monospace; padding: 1px 5px; border: 1px solid #4a4f5c;
+    border-bottom-width: 2px; border-radius: 4px; color: var(--fg); }
+  @media (max-width: 760px) {
+    main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+    .label b { font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <section>
+    <iframe id="left" src="outputs/grok-4.7-xhigh.html" title="Grok 4.7 output"></iframe>
+    <div class="label"><b>Grok 4.7</b><span>xHigh</span><a href="outputs/grok-4.7-xhigh.html" target="_blank" rel="noopener">open alone ↗</a></div>
+  </section>
+  <section>
+    <iframe id="right" src="outputs/claude-opus-5.5-ultra.html" title="Claude Opus 5.5 output"></iframe>
+    <div class="label"><b>Claude Opus 5.5</b><span>ultra</span><a href="outputs/claude-opus-5.5-ultra.html" target="_blank" rel="noopener">open alone ↗</a></div>
+  </section>
+</main>
+<footer>
+  <span>Same prompt, one shot each, outputs unedited.</span>
+  <span>Click either side, then <kbd>Space</kbd> <kbd>S</kbd> <kbd>0</kbd>–<kbd>9</kbd> <kbd>R</kbd>. Keys are mirrored to both sides.</span>
+  <span><a href="https://github.com/negevtvx/grok-vs-opus-catgirl-run">Prompt, raw files &amp; details on GitHub</a></span>
+</footer>
+<script>
+  // Mirror real key presses from one iframe to the other (same origin only, e.g. on GitHub Pages).
+  const frames = [document.getElementById('left'), document.getElementById('right')];
+  const KEYS = /^(Space|KeyS|KeyR|Digit[0-9]|Numpad[0-9])$/;
+  function mirror(from, to) {
+    try {
+      from.contentWindow.addEventListener('keydown', e => {
+        if (!e.isTrusted || !KEYS.test(e.code)) return;
+        const copy = new to.contentWindow.KeyboardEvent('keydown', {
+          key: e.key, code: e.code, repeat: e.repeat, bubbles: true, cancelable: true,
+        });
+        to.contentWindow.dispatchEvent(copy);
+      });
+    } catch (err) { /* cross-origin (e.g. opened from disk): each side still works on its own */ }
+  }
+  const ready = f => new Promise(res => {
+    try { if (f.contentDocument && f.contentDocument.readyState === 'complete' && f.contentWindow.location.href !== 'about:blank') return res(); } catch (err) {}
+    f.addEventListener('load', () => res(), { once: true });
+  });
+  Promise.all(frames.map(ready)).then(() => { mirror(frames[0], frames[1]); mirror(frames[1], frames[0]); });
+</script>
+</body>
+</html>
