@@ -1,70 +1,83 @@
-# Grok 4.7 vs Claude Opus 5.5: one prompt, a procedural 3D cat-girl run cycle
+# Same prompt. One shot each. Grok 4.7 vs Claude Opus 5.5.
 
-![Side-by-side preview](media/preview.gif)
+*By [@NegevTV_](https://x.com/NegevTV_) on X*
 
-**Run them yourself:** [side by side](https://negevtvx.github.io/grok-vs-opus-catgirl-run/) · [Grok 4.7 alone](https://negevtvx.github.io/grok-vs-opus-catgirl-run/outputs/grok-4.7-xhigh.html) · [Claude Opus 5.5 alone](https://negevtvx.github.io/grok-vs-opus-catgirl-run/outputs/claude-opus-5.5-ultra.html)
+![Grok 4.7 on the left, Claude Opus 5.5 on the right, same prompt](media/preview.gif)
 
-Both models got the same prompt once. Neither output was edited, retried or cherry-picked. The two HTML files in [`outputs/`](outputs) are exactly what the models returned, byte for byte (hashes below).
+I gave two frontier models the exact same (long, annoyingly specific) prompt: **build a 3D anime cat-girl from scratch and make her run in a perfect loop, all in one HTML file.** No 3D models, no textures, no images. Just code and math.
 
-| | Model | Setting | Output |
-|---|---|---|---|
-| Left | Grok 4.7 | xHigh | [`outputs/grok-4.7-xhigh.html`](outputs/grok-4.7-xhigh.html) |
-| Right | Claude Opus 5.5 | ultra | [`outputs/claude-opus-5.5-ultra.html`](outputs/claude-opus-5.5-ultra.html) |
+One shot each. No retries, no edits, no "let me regenerate that real quick."
 
-## The prompt
+**Left:** Grok 4.7 (xHigh). **Right:** Claude Opus 5.5 (ultra).
 
-The full prompt is in [`prompt.txt`](prompt.txt). In short, it asks for:
+I'm not gonna tell you what to think. You have eyes.
 
-- **One self-contained HTML file** using Three.js r160 from a fixed import map. No other libraries, models, images, textures or fonts. Everything is built procedurally.
-- **A real joint hierarchy**: pelvis → spine → chest → neck → head, both arms down to the hands, both legs down to the feet. Stylized anime proportions, about 4 heads tall.
-- **Specific design details**: shoulder-length hair with blunt bangs (10+ separate clumps), cat ears, a tail with 10+ chained segments, big anime eyes, blush, an oversized hoodie, track pants, sneakers with red soles, toon shading with inverted-hull outlines.
-- **A seamless run loop driven by a single phase value**, using only integer-harmonic sin/cos. It needs contact, down, passing, up and flight phases, a body bob, hip and torso counter-rotation, arm swing, a stabilized head, ear bounce, tail follow-through, and hair lag.
-- **A ground that scrolls at the planted foot's speed**, so the feet don't slide.
-- **Controls**: Space pause/play, S 0.25× slow motion, 0–9 jump to a phase, R reset camera, plus OrbitControls.
+### ▶ [Play with both live, side by side](https://negevtvx.github.io/grok-vs-opus-catgirl-run/)
 
-The prompt contains a template placeholder, `{{HAIR_COLOR}}`, that was never filled in. Both models noticed it and picked a color themselves. Grok chose auburn (`#a15c38`) and Opus chose lavender (`#8e7cc3`). Both explain the choice in the comment at the top of their file.
+It runs right in your browser, nothing to install. Click a side, then hit <kbd>Space</kbd>, <kbd>S</kbd>, <kbd>0</kbd>–<kbd>9</kbd> or <kbd>R</kbd>. The keys fire on both sides at once. Drag to spin the camera, scroll to zoom.
 
-## Try it yourself
+Or open them one at a time: [Grok 4.7](https://negevtvx.github.io/grok-vs-opus-catgirl-run/outputs/grok-4.7-xhigh.html) · [Claude Opus 5.5](https://negevtvx.github.io/grok-vs-opus-catgirl-run/outputs/claude-opus-5.5-ultra.html)
 
-- **Live:** use the links at the top. The side-by-side page mirrors key presses to both sides. Click either one, then press <kbd>Space</kbd>, <kbd>S</kbd>, <kbd>0</kbd>–<kbd>9</kbd> or <kbd>R</kbd>.
-- **Locally:** download either file from [`outputs/`](outputs) and open it in Chrome. Three.js loads from jsDelivr, so you need an internet connection.
+---
 
-| Key | Action |
-|---|---|
-| <kbd>Space</kbd> | pause / play |
-| <kbd>S</kbd> | toggle 0.25× slow motion |
-| <kbd>0</kbd>–<kbd>9</kbd> | pause and jump to phase p = 0.0 … 0.9 |
-| <kbd>R</kbd> | reset the camera |
-| drag / scroll | orbit / zoom |
+## "You cherry-picked." No I didn't. Receipts:
 
-## Side-by-side video
+- **The exact prompt:** [`prompt.txt`](prompt.txt), word for word.
+- **Both raw outputs:** [`outputs/`](outputs). The files are byte for byte what each model returned. I only renamed them.
+- **SHA-256 hashes** are at the bottom, so you can check I didn't touch shit.
+- **The side-by-side video** ([`media/side-by-side.mp4`](media/side-by-side.mp4)) was recorded with identical inputs hitting both pages on the same frames. Same slow-mo, same pause, same camera drags, same zoom, same everything.
 
-[`media/side-by-side.mp4`](media/side-by-side.mp4) is 24 seconds long at 720p60, no audio. Grok is on the left and Opus is on the right. Both get exactly the same inputs: slow motion, pause, an orbit to the front, a zoom on the face, an orbit around the back, a camera reset, then the phase keys 0, 2, 4, 6 and 8.
+Don't trust me. Download the files and run them yourself.
 
-<details>
-<summary>How it was recorded</summary>
+## What the prompt actually asked for
 
-- Both pages ran in headless Chromium at 960×960 with Playwright's fake clock. Time only moved forward in exact 1/60 s steps, and a frame was captured after each step. That keeps the two halves in sync to within a frame or two. The only slack is exactly when an input event lands relative to a page's animation frame.
-- Every key press, mouse drag and scroll event came from one script and hit both pages on the same frame. The only differences you see come from the code itself. For example, Grok's camera has OrbitControls damping turned on and Opus's doesn't, so after a drag Grok's camera eases to a stop and Opus's stops immediately.
-- WebGL was software-rendered (SwiftShader) because the capture machine had no GPU. On a real GPU both look a bit crisper.
-- The capture machine couldn't reach jsDelivr, so Three.js was served locally from the official `r160` tag of the three.js repository. That's the same release the import map points to.
-- The recording script, this README and the side-by-side page were put together with Claude's help. The two model outputs themselves are untouched.
+The long version is in [`prompt.txt`](prompt.txt). The short version:
 
-</details>
+- One self-contained HTML file on Three.js r160. No other libraries, and every mesh built in code.
+- A real skeleton: pelvis → spine → chest → neck → head, plus arms and legs with proper joints.
+- Anime proportions, about 4 heads tall, cute but not chibi.
+- Shoulder-length hair with blunt bangs (10+ separate clumps), cat ears with pink insides, and a tail with 10+ segments.
+- Big anime eyes with highlights, blush, an oversized hoodie, track pants, white sneakers with red soles.
+- Toon shading with black outlines.
+- A run cycle that loops perfectly: flight phase, body bob, hips and torso counter-rotating, arms swinging, a stable head, bouncy ears, a tail with follow-through, and hair that lags behind.
+- A ground that scrolls at exactly the foot's speed, so her feet don't slide.
+- Controls for pause, slow-mo, phase jumps and camera reset.
 
-## All ten phase keys, same camera
+That's a lot to get right in one shot. Watch the video and see who actually did it.
 
-![Phases 0.0 to 0.9 for both outputs](media/phases.png)
+## Stuff worth noticing
 
-## Facts
+- **The hair.** Grok built the bangs out of what are basically little wooden planks. Opus went with actual tapered hair clumps, side locks and an ahoge.
+- **The face.** Grok's head is a big smooth ball with the eyes stuck on the front. Opus painted a full anime face onto a head with an actual jawline.
+- **The tail.** Grok's looks like it came off a rat. Opus's looks like it came off a cat.
+- **The outfit.** Opus added side stripes on the track pants and "sleeve paws" on the hoodie, and nobody even asked for those.
+- **Credit where it's due.** The prompt had a `{{HAIR_COLOR}}` placeholder that never got filled in. Both models caught it and picked a color themselves: Grok went auburn and Opus went lavender. Both files also run with **zero console errors**, so Grok's isn't broken. It's just like that.
+- **Another point for Grok:** its camera has smooth damping when you orbit. Opus's doesn't.
+
+## Facts, no vibes
 
 | | Grok 4.7 (xHigh) | Claude Opus 5.5 (ultra) |
 |---|---|---|
 | File size | 25,075 bytes, 763 lines | 42,210 bytes, 770 lines |
 | Console errors or warnings (headless Chromium) | 0 | 0 |
 | Hair color picked for `{{HAIR_COLOR}}` | `#a15c38` auburn | `#8e7cc3` lavender |
+| Hair pieces | 15 box/cylinder clumps | 19 spline-tube clumps (ahoge included) + 2 scalp caps |
+| Tail segments | 12 | 12 |
 
-SHA-256:
+![All ten phase keys, same camera, both models](media/phases.png)
+
+<details>
+<summary>How the video was recorded (for the nerds)</summary>
+
+- Both pages ran in headless Chromium at 960×960 on Playwright's fake clock. Time moved forward in exact 1/60 s steps, with one frame captured per step. That keeps the two halves in sync to within a frame or two. The only slack is exactly when an input event lands relative to each page's animation frame.
+- Every key press, mouse drag and scroll came from one script and hit both pages on the same frame. Any difference you see comes from the code itself.
+- WebGL was software-rendered (SwiftShader) because the capture box had no GPU. On a real GPU both look a bit crisper.
+- The capture box couldn't reach jsDelivr, so Three.js was served locally from the official `r160` tag of the three.js repo. That's the same release the import map points to.
+- Yes, Claude helped put this repo together (the recording script, this README and the side-by-side page). Yes, that's a conflict of interest, which is exactly why the raw files and hashes are right here. The two model outputs themselves are untouched.
+
+</details>
+
+## Hashes
 
 ```
 e00ddb6ddeaff8ef4da5e109d7061617eba09fc1b11217b9acc5ef4f441d9556  outputs/grok-4.7-xhigh.html
@@ -72,4 +85,6 @@ e00ddb6ddeaff8ef4da5e109d7061617eba09fc1b11217b9acc5ef4f441d9556  outputs/grok-4
 c20bb0d0aaf1a554a41f27b8f818b6ef139e5cb104e1829459bd20bb0ec14ae3  prompt.txt
 ```
 
-Judge for yourself.
+---
+
+If this made you laugh, drop a star. Want another round with a different prompt or other models? Open an issue, or yell at me on X: **[@NegevTV_](https://x.com/NegevTV_)**.
